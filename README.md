@@ -1,5 +1,7 @@
-rosbridge_suite [![Build Status](https://api.travis-ci.org/RobotWebTools/rosbridge_suite.png)](https://travis-ci.org/RobotWebTools/rosbridge_suite)
+rosbridge_suite
 ===============
+
+Modification by LG Electronics, Inc. add support for protobuf messages and improve performance for use with Apollo and [LG's simulator for autonomous vehicles](https://github.com/lgsvl/simulator).  
 
 #### Server Implementations of the rosbridge v2 Protocol
 
