@@ -287,6 +287,8 @@ class Protocol:
                 return json.dumps(msg)
         except:
             if cid is not None:
+                import traceback
+                traceback.print_exc()
                 # Only bother sending the log message if there's an id
                 self.log("error", "Unable to serialize %s message to client"
                          % msg["op"], cid)

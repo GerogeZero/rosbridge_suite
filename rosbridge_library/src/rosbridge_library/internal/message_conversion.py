@@ -199,21 +199,27 @@ def _from_list_inst(inst, rostype):
     return [_from_inst(x, rostype) for x in inst]
 
 
+from google.protobuf.internal.containers import RepeatedCompositeFieldContainer, MessageMap, RepeatedScalarFieldContainer
+
 def _from_pb(inst):
     msg = {}
+
     for field in inst.DESCRIPTOR.fields:
         field_name = field.name
         field_inst = getattr(inst, field_name)
         pbtype = field.type
         if pbtype == 11:
-            msg[field_name] = _from_pb(field_inst)
+            if type(field_inst) not in [RepeatedScalarFieldContainer, RepeatedCompositeFieldContainer, MessageMap]:
+                msg[field_name] = _from_pb(field_inst)
         else:
             #print(field_name, pbtype)
             if pbtype == 1 and type(field_inst) != float:
                 continue
-            field_rostype = pb_msg_type_map[pbtype]
-            msg[field_name] = _from_inst(field_inst, field_rostype)
+            if type(field_inst) not in [RepeatedScalarFieldContainer, RepeatedCompositeFieldContainer, MessageMap]:
+                field_rostype = pb_msg_type_map[pbtype]
+                msg[field_name] = _from_inst(field_inst, field_rostype)
     return msg
+
 
 def _from_object_inst(inst, rostype):
     # Create an empty dict then populate with values from the inst
