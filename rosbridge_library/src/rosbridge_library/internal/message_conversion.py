@@ -45,6 +45,8 @@ from base64 import standard_b64encode, standard_b64decode
 from rosbridge_library.util import string_types, bson
 from rosbridge_library.internal.exceptions import MissingProtobufDescriptorException, InvalidProtobufFieldException
 
+from google.protobuf.internal.containers import BaseContainer, MessageMap
+
 import sys
 if sys.version_info >= (3, 0):
     type_map = {
@@ -199,8 +201,6 @@ def _from_list_inst(inst, rostype):
     return [_from_inst(x, rostype) for x in inst]
 
 
-from google.protobuf.internal.containers import RepeatedCompositeFieldContainer, MessageMap, RepeatedScalarFieldContainer
-
 def _from_pb(inst):
     msg = {}
 
@@ -209,15 +209,22 @@ def _from_pb(inst):
         field_inst = getattr(inst, field_name)
         pbtype = field.type
         if pbtype == 11:
-            if type(field_inst) not in [RepeatedScalarFieldContainer, RepeatedCompositeFieldContainer, MessageMap]:
+            if isinstance(field_inst, BaseContainer):
+                if field_name not in msg:
+                  msg[field_name] = []
+                msg[field_name] += [_from_pb(x) for x in field_inst]
+            elif not isinstance(field_inst, MessageMap):
                 msg[field_name] = _from_pb(field_inst)
+            #else:
+            #    print("IGNORE", field_name, type(field_inst))
         else:
-            #print(field_name, pbtype)
             if pbtype == 1 and type(field_inst) != float:
                 continue
-            if type(field_inst) not in [RepeatedScalarFieldContainer, RepeatedCompositeFieldContainer, MessageMap]:
+            if not isinstance(field_inst, BaseContainer) and not isinstance(field_inst, MessageMap):
                 field_rostype = pb_msg_type_map[pbtype]
                 msg[field_name] = _from_inst(field_inst, field_rostype)
+            #else:
+            #    print("IGNORE", field_name, type(field_inst))
     return msg
 
 
