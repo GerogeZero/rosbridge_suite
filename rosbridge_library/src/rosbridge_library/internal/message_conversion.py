@@ -409,10 +409,8 @@ def _to_protobuf_repeated_inst(msg, rostype, roottype, inst, stack):
     if len(msg) == 0:
         return inst
 
-    field_inst = ros_loader.get_message_instance("{}/{}".format(PB_NAMESPACE, rostype))
     for x in msg:
-        sub_inst = _to_inst(x, rostype, roottype, field_inst, stack)
-        inst.extend([sub_inst])
+        _to_inst(x, rostype, roottype, inst.add(), stack)
 
     return inst
 
