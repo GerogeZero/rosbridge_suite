@@ -297,8 +297,8 @@ def _to_time_inst(msg, rostype, inst=None):
     # Copy across the fields
     for field in ["secs", "nsecs"]:
         try:
-            if field in msg["data"]:
-                setattr(inst, field, msg["data"][field])
+            if field in msg:
+                setattr(inst, field, msg[field])
         except TypeError:
             continue
 
