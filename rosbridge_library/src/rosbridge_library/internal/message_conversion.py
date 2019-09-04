@@ -151,9 +151,11 @@ def extract_values(inst):
     return _from_inst(inst, rostype)
 
 
-def populate_instance(msg, inst, typestring):
+def populate_instance(msg, inst, typestring = None):
     """ Returns an instance of the provided class, with its fields populated
     according to the values in msg """
+    if (typestring is None):
+        return _to_inst(msg, inst._type, inst._type, inst)
     return _to_inst(msg, typestring, typestring, inst)
 
 
@@ -256,7 +258,7 @@ def _to_inst(msg, rostype, roottype, inst=None, stack=[]):
         return _to_list_inst(msg, rostype, roottype, inst, stack)
 
     # Check whether we're dealing with protobuf type
-    if is_protobuf_msg(roottype):
+    if roottype is not None and is_protobuf_msg(roottype):
         if isinstance(msg, list):  # RepeatedCompositeContainer
             return _to_protobuf_repeated_inst(msg, rostype, roottype, inst, stack)
         return _to_protobuf_object_inst(msg, rostype, roottype, inst, stack)
